@@ -57,35 +57,65 @@ FONT_DOWNLOAD_URL = "https://github.com/googlefonts/noto-fonts/raw/main/hinted/t
 TEXT_POSITIONS = [
     "bottom-left",      # Góc dưới trái
     "bottom-right",     # Góc dưới phải  
-    "top-center",       # Trên cùng giữa
-    "center",           # Chính giữa
     "top-left",         # Góc trên trái
-    "bottom-center"     # Dưới cùng giữa
+    "top-right",        # Góc trên phải (thêm mới)
+    "bottom-center",    # Dưới cùng giữa
+    "top-center-edge",  # Trên cùng sát mép (thay thế top-center)
+    "left-center",      # Giữa bên trái
+    "right-center"      # Giữa bên phải    # Dưới cùng giữa
 ]
 
 BACKGROUND_SHAPES = [
-    "rounded-rectangle",    # Hình chữ nhật bo góc
-    "ellipse",              # Hình elip
-    "banner-ribbon",        # Dải băng
-    "highlight-stroke",     # Viền nổi bật
-    "tag-label",            # Nhãn tag
-    "paper-note",           # Giấy note
-    "wooden-sign",          # Bảng gỗ
-    "organic-blob",         # Hình blob tự nhiên
-    "diagonal-banner",      # Banner chéo
-    "glass-morphism"        # Kính mờ
+    # Hình chữ nhật bo góc - an toàn nhất, text luôn vừa
+    "rounded-rectangle",
+    
+    # Hình chữ nhật đơn giản
+    "rectangle",
+    
+    # Hình viên thuốc - phù hợp với text ngắn
+    "pill-shape",
+    
+    # Hình elip - phù hợp với text vừa phải
+    "ellipse",
+    
+    # Hình thoi - text cần căn giữa
+    "diamond",
+    
+    # Hình lục giác - text ngắn
+    "hexagon",
+    
+    # Banner ruy băng - đẹp cho text dài
+    "banner-ribbon",
+    
+    # Nhãn dán - text ngắn
+    "tag-label",
+    
+    # Khung viền đôi - text dài cũng đẹp
+    "double-border",
+    
+    # Hiệu ứng kính mờ - text dài vẫn đẹp
+    "glass-morphism",
+    
+    # Bookmark - text ngắn
+    "bookmark",
+    
+    # Hộp gradient - text dài
+    "gradient-box",
+    
+    # Khung ngoặc - text dài
+    "frame-bracket"
 ]
 
-# Màu sắc cho các theme (cập nhật để dễ nhìn hơn)
+# Màu sắc cho các theme
 COLOR_THEMES = [
-    {"name": "Đỏ Đen", "primary": "#FF1A1A", "secondary": "#FFFFFF", "bg": (0, 0, 0, 180), "text_light": True},
-    {"name": "Vàng Trắng", "primary": "#FFD700", "secondary": "#000000", "bg": (255, 255, 255, 200), "text_light": False},
-    {"name": "Xanh lá Đen", "primary": "#4CAF50", "secondary": "#FFFFFF", "bg": (0, 0, 0, 160), "text_light": True},
-    {"name": "Xanh dương Đen", "primary": "#2196F3", "secondary": "#FFFFFF", "bg": (0, 0, 0, 170), "text_light": True},
-    {"name": "Tím Đen", "primary": "#9C27B0", "secondary": "#FFFFFF", "bg": (0, 0, 0, 180), "text_light": True},
-    {"name": "Cam Trắng", "primary": "#FF9800", "secondary": "#000000", "bg": (255, 255, 255, 190), "text_light": False},
-    {"name": "Hồng Pastel", "primary": "#E91E63", "secondary": "#FFFFFF", "bg": (255, 235, 238, 200), "text_light": False},
-    {"name": "Xanh Mint", "primary": "#009688", "secondary": "#FFFFFF", "bg": (0, 0, 0, 170), "text_light": True},
+    {"name": "Đỏ Đen", "primary": "#FF1A1A", "secondary": "#FFFFFF", "bg": (0, 0, 0, 200), "text_light": True},
+    {"name": "Vàng Trắng", "primary": "#FFD700", "secondary": "#000000", "bg": (255, 255, 255, 220), "text_light": False},
+    {"name": "Xanh lá Đen", "primary": "#4CAF50", "secondary": "#FFFFFF", "bg": (0, 0, 0, 190), "text_light": True},
+    {"name": "Xanh dương Đen", "primary": "#2196F3", "secondary": "#FFFFFF", "bg": (0, 0, 0, 190), "text_light": True},
+    {"name": "Tím Đen", "primary": "#9C27B0", "secondary": "#FFFFFF", "bg": (0, 0, 0, 190), "text_light": True},
+    {"name": "Cam Trắng", "primary": "#FF9800", "secondary": "#000000", "bg": (255, 255, 255, 210), "text_light": False},
+    {"name": "Hồng Pastel", "primary": "#E91E63", "secondary": "#FFFFFF", "bg": (255, 235, 238, 220), "text_light": False},
+    {"name": "Xanh Mint", "primary": "#009688", "secondary": "#FFFFFF", "bg": (0, 0, 0, 190), "text_light": True},
 ]
 
 # --- HÀM TIỆN ÍCH ---
@@ -149,126 +179,226 @@ def load_font(size: int, font_path: str = None) -> ImageFont.FreeTypeFont:
     return ImageFont.load_default()
 
 def draw_location_pin(draw, x, y, size=69, color_theme=None):
+    """Vẽ icon pin với kích thước phù hợp"""
     red_color = "#FF1A1A"
     stick_color = "#0B0A0A"
-    x_offset = int(size * 0.65)
-    y_offset = int(size * 0.74)
-    new_x = x + x_offset
-    new_y = y + y_offset
-    stick_height = int(size * 0.7)
-    stick_w = max(3, int(size * 0.13))
-    circle_r = int(size * 0.35)
-    circle_center = (int(new_x + size / 2), int(new_y - stick_height))
-    stick_start = (int(new_x + size / 2), int(new_y + size / 2))
-    stick_end = (circle_center[0], circle_center[1] - circle_r - int(size * 0.22))
+    
+    # Điều chỉnh kích thước để icon không quá to
+    pin_size = size
+    stick_height = int(pin_size * 0.6)
+    stick_w = max(2, int(pin_size * 0.1))
+    circle_r = int(pin_size * 0.3)
+
+    # Vị trí vẽ
+    circle_center = (x + circle_r + 5, y + stick_height - 5)
+    stick_start = (circle_center[0], circle_center[1] + circle_r + 5)
+    stick_end = (circle_center[0], stick_start[1] + stick_height)
+    
+    # Vẽ que
     draw.line([stick_start, stick_end], fill=stick_color, width=stick_w)
+    
+    # Vẽ hình tròn
     draw.ellipse([
         circle_center[0] - circle_r, circle_center[1] - circle_r,
         circle_center[0] + circle_r, circle_center[1] + circle_r
     ], fill=red_color)
-    highlight_r = int(circle_r * 0.4)
+    
+    # Highlight
+    highlight_r = int(circle_r * 0.3)
     highlight_color = "#FF6666" if color_theme and color_theme["text_light"] else "#FF9999"
     draw.ellipse([
         circle_center[0] - highlight_r, circle_center[1] - highlight_r,
         circle_center[0], circle_center[1]
     ], fill=highlight_color)
+    
+    # Trả về vị trí bắt đầu của text (sau icon)
+    return circle_center[0] + circle_r + 10
 
 def draw_background_shape(draw, bbox, shape_type, color_theme):
-    """Vẽ hình dạng nền cho text"""
+    """Vẽ hình dạng nền cho text - chỉ các shape text fit vừa"""
     x1, y1, x2, y2 = bbox
-    padding = 20
+    padding = 30
+    
+    # Đảm bảo tọa độ hợp lệ
+    x1 = max(0, x1 - padding)
+    y1 = max(0, y1 - padding)
+    x2 = min(draw.im.size[0], x2 + padding)
+    y2 = min(draw.im.size[1], y2 + padding)
+    
+    if x1 >= x2 or y1 >= y2:
+        draw.rectangle([x1, y1, x2, y2], fill=color_theme["bg"])
+        return
+    
+    width = x2 - x1
+    height = y2 - y1
+    center_x = (x1 + x2) // 2
+    center_y = (y1 + y2) // 2
+    
+    # === CÁC SHAPE TEXT FIT TỐT ===
     
     if shape_type == "rounded-rectangle":
-        draw.rounded_rectangle([x1-padding, y1-padding, x2+padding, y2+padding], 
-                              radius=15, fill=color_theme["bg"])
+        # Hình chữ nhật bo góc - text luôn vừa
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=25, fill=color_theme["bg"])
+    
+    elif shape_type == "rectangle":
+        # Hình chữ nhật đơn giản
+        draw.rectangle([x1, y1, x2, y2], fill=color_theme["bg"])
+    
+    elif shape_type == "pill-shape":
+        # Hình viên thuốc - bo tròn hoàn toàn 2 đầu
+        radius = height // 2
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=radius, fill=color_theme["bg"])
+    
     elif shape_type == "ellipse":
-        draw.ellipse([x1-padding, y1-padding, x2+padding, y2+padding], 
-                    fill=color_theme["bg"])
-    elif shape_type == "banner-ribbon":
-        # Vẽ ribbon với đuôi nhọn
+        # Hình elip - text nên ngắn
+        # Điều chỉnh elip để không quá hẹp
+        ellipse_width = max(width, height * 1.5)
+        ellipse_x1 = center_x - ellipse_width // 2
+        ellipse_x2 = center_x + ellipse_width // 2
+        draw.ellipse([ellipse_x1, y1, ellipse_x2, y2], fill=color_theme["bg"])
+    
+    elif shape_type == "diamond":
+        # Hình thoi - text cần căn giữa
         points = [
-            (x1-padding-30, y1-padding),  # Điểm nhọn trái
-            (x1-padding, y1-padding),
-            (x2+padding, y1-padding),
-            (x2+padding+30, (y1+y2)/2),    # Điểm nhọn phải
-            (x2+padding, y2+padding),
-            (x1-padding, y2+padding)
+            (center_x, y1),
+            (x2, center_y),
+            (center_x, y2),
+            (x1, center_y)
         ]
         draw.polygon(points, fill=color_theme["bg"])
-    elif shape_type == "highlight-stroke":
-        # Viền đậm với màu primary
-        draw.rectangle([x1-padding, y1-padding, x2+padding, y2+padding], 
-                      outline=color_theme["primary"], width=4)
-    elif shape_type == "tag-label":
-        # Hình tag với lỗ tròn
-        draw.rounded_rectangle([x1-padding, y1-padding, x2+padding, y2+padding], 
-                              radius=10, fill=color_theme["bg"])
-        circle_x = x1 - padding + 15
-        circle_y = (y1 + y2) // 2
-        draw.ellipse([circle_x-8, circle_y-8, circle_x+8, circle_y+8], 
-                    fill=color_theme["secondary"])
-    elif shape_type == "paper-note":
-        # Giấy note với ghim
-        draw.rectangle([x1-padding, y1-padding, x2+padding, y2+padding], 
-                      fill=color_theme["bg"])
-        # Vẽ ghim
-        pin_x = (x1 + x2) // 2
-        pin_y = y1 - padding + 5
-        draw.ellipse([pin_x-10, pin_y-10, pin_x+10, pin_y+10], 
-                    fill=color_theme["primary"])
-    elif shape_type == "wooden-sign":
-        # Bảng gỗ với dây treo
-        draw.rectangle([x1-padding, y1-padding, x2+padding, y2+padding], 
-                      fill=(139, 69, 19, 200))
-        # Vẽ dây
-        rope_y = y1 - padding - 10
-        draw.arc([x1-padding, rope_y, x1+padding, rope_y+20], 0, 180, 
-                fill=(101, 67, 33), width=3)
-    elif shape_type == "organic-blob":
-        # Hình blob tự nhiên (đơn giản hóa)
+    
+    elif shape_type == "hexagon":
+        # Hình lục giác - text ngắn
         points = []
-        center_x = (x1 + x2) // 2
-        center_y = (y1 + y2) // 2
-        radius_x = (x2 - x1) // 2 + padding
-        radius_y = (y2 - y1) // 2 + padding
-        for angle in range(0, 360, 30):
-            rad = math.radians(angle)
-            r_var = 1 + 0.1 * math.sin(3 * rad)
-            x = center_x + radius_x * r_var * math.cos(rad)
-            y = center_y + radius_y * r_var * math.sin(rad)
+        for i in range(6):
+            angle = math.pi * 2 * i / 6 - math.pi / 2
+            x = center_x + width/2 * math.cos(angle)
+            y = center_y + height/2 * math.sin(angle)
             points.append((x, y))
         draw.polygon(points, fill=color_theme["bg"])
-    elif shape_type == "diagonal-banner":
-        # Banner chéo
-        width = x2 - x1 + 2*padding
-        height = y2 - y1 + 2*padding
+    
+    elif shape_type == "banner-ribbon":
+        # Banner ruy băng - đẹp cho mọi độ dài text
+        ribbon_height = height // 4
+        points = [
+            (x1, y1),
+            (x2, y1),
+            (x2, y2 - ribbon_height),
+            (center_x, y2),
+            (x1, y2 - ribbon_height)
+        ]
+        draw.polygon(points, fill=color_theme["bg"])
+        # Thêm đuôi ruy băng nhỏ
+        tail_width = min(30, width // 4)
         draw.polygon([
-            (x1-padding, y1-padding),
-            (x1-padding+width*0.85, y1-padding),
-            (x2+padding, y2+padding),
-            (x1-padding+width*0.15, y2+padding)
+            (center_x, y2),
+            (center_x - tail_width//2, y2 + tail_width),
+            (center_x, y2 + tail_width//2),
+            (center_x + tail_width//2, y2 + tail_width)
         ], fill=color_theme["bg"])
+    
+    elif shape_type == "tag-label":
+        # Nhãn dán - text ngắn
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=20, fill=color_theme["bg"])
+        # Đuôi nhãn bên trái
+        tail_size = min(20, height // 3)
+        tail_x = x1 - tail_size
+        tail_y = (y1 + y2) // 2
+        draw.polygon([
+            (tail_x, tail_y - tail_size//2),
+            (x1, tail_y),
+            (tail_x, tail_y + tail_size//2)
+        ], fill=color_theme["bg"])
+    
+    elif shape_type == "double-border":
+        # Viền đôi - text dài cũng đẹp
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=20, 
+                              fill=color_theme["bg"])
+        # Viền ngoài
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=20, 
+                              outline=color_theme["primary"], width=3)
+        # Viền trong
+        draw.rounded_rectangle([x1+8, y1+8, x2-8, y2-8], radius=15, 
+                              outline=color_theme["secondary"], width=2)
+    
     elif shape_type == "glass-morphism":
-        # Hiệu ứng kính mờ
-        overlay = Image.new('RGBA', (x2-x1+2*padding, y2-y1+2*padding), 
-                           color_theme["bg"])
-        overlay = overlay.filter(ImageFilter.GaussianBlur(radius=5))
-        # Vẽ viền trắng mờ
-        draw.rounded_rectangle([x1-padding, y1-padding, x2+padding, y2+padding],
-                              radius=15, outline=(255,255,255,100), width=2)
+        # Kính mờ - text dài vẫn đẹp
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=25, fill=color_theme["bg"])
+        # Hiệu ứng viền sáng
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=25, 
+                              outline=(255,255,255,100), width=2)
+        # Thêm hiệu ứng highlight góc
+        highlight_size = min(40, width // 5)
+        draw.ellipse([x1+5, y1+5, x1+highlight_size, y1+highlight_size], 
+                    fill=(255,255,255,50))
+    
+    elif shape_type == "bookmark":
+        # Bookmark - text ngắn đến trung bình
+        bookmark_tail = min(40, height // 4)
+        points = [
+            (x1, y1),
+            (x2, y1),
+            (x2, y2 - bookmark_tail),
+            (center_x, y2),
+            (x1, y2 - bookmark_tail)
+        ]
+        draw.polygon(points, fill=color_theme["bg"])
+        # Thêm lỗ tròn nhỏ ở đuôi
+        hole_radius = 8
+        draw.ellipse([center_x - hole_radius, y2 - bookmark_tail//2 - hole_radius,
+                      center_x + hole_radius, y2 - bookmark_tail//2 + hole_radius],
+                     fill=(255,255,255,200))
+    
+    elif shape_type == "gradient-box":
+        # Hộp gradient - text dài
+        # Vẽ nhiều lớp tạo hiệu ứng gradient
+        for i in range(8):
+            alpha = 255 - i * 30
+            if isinstance(color_theme["bg"], tuple) and len(color_theme["bg"]) >= 3:
+                r, g, b = color_theme["bg"][:3]
+                gradient_color = (r, g, b, max(alpha, 30))
+            else:
+                gradient_color = color_theme["bg"]
+            offset = i * 3
+            if offset * 2 < min(width, height):
+                draw.rounded_rectangle([x1+offset, y1+offset, x2-offset, y2-offset], 
+                                      radius=20, fill=gradient_color)
+    
+    elif shape_type == "frame-bracket":
+        # Khung ngoặc - text dài
+        draw.rectangle([x1, y1, x2, y2], fill=color_theme["bg"])
+        bracket_size = min(20, width // 10, height // 10)
+        # Vẽ ngoặc ở 4 góc
+        # Góc trên trái
+        draw.line([(x1, y1+bracket_size), (x1, y1), (x1+bracket_size, y1)], 
+                 fill=color_theme["primary"], width=4)
+        # Góc trên phải
+        draw.line([(x2-bracket_size, y1), (x2, y1), (x2, y1+bracket_size)], 
+                 fill=color_theme["primary"], width=4)
+        # Góc dưới trái
+        draw.line([(x1, y2-bracket_size), (x1, y2), (x1+bracket_size, y2)], 
+                 fill=color_theme["primary"], width=4)
+        # Góc dưới phải
+        draw.line([(x2-bracket_size, y2), (x2, y2), (x2, y2-bracket_size)], 
+                 fill=color_theme["primary"], width=4)
+    
+    else:
+        # Mặc định là hình chữ nhật bo góc
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=20, fill=color_theme["bg"])
 
 def add_text_with_layout(image_pil, ten, gio, dc, target_size, layout_config, color_theme, font_path=None, font_scale=1.0):
     """
-    Thêm text vào ảnh với layout, hình dạng nền và COLOR THEME được chỉ định
+    Thêm text vào ảnh với layout - TRÁNH ĐẶT Ở TRUNG TÂM
     """
     try:
+        # Resize ảnh
         img = ImageOps.fit(image_pil.convert("RGB"), target_size, centering=(0.5, 0.5))
         
-        # Tạo overlay cho background shape nếu cần
+        # Tạo layer overlay cho background shape
         overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
         overlay_draw = ImageDraw.Draw(overlay)
         
-        # Convert to RGBA for compositing
+        # Convert to RGBA
         img = img.convert("RGBA")
         draw = ImageDraw.Draw(img)
         
@@ -276,7 +406,7 @@ def add_text_with_layout(image_pil, ten, gio, dc, target_size, layout_config, co
         scale_factor = (target_size[0] / 900.0) * font_scale
         
         # Font sizes
-        font_size_ten = max(35, int(60 * scale_factor))
+        font_size_ten = max(40, int(65 * scale_factor))
         font_size_info = max(22, int(28 * scale_factor))
         
         font_ten = load_font(font_size_ten, font_path)
@@ -285,400 +415,472 @@ def add_text_with_layout(image_pil, ten, gio, dc, target_size, layout_config, co
         position = layout_config.get("position", "bottom-left")
         shape = layout_config.get("shape", "rounded-rectangle")
         
-        # Tính toán vị trí text
-        margin = int(40 * scale_factor / font_scale)
+        # Margin cơ bản - tránh xa trung tâm
+        base_margin = int(80 * scale_factor / font_scale)
+        
+        # Chuẩn bị text
+        ten_text = ten.upper()
+        gio_text = f"Giờ mở cửa: {gio}"
+        
+        # Xử lý địa chỉ xuống dòng
+        max_dc_width = width * 0.45  # Giới hạn chiều rộng cho địa chỉ
+        dc_lines = []
+        current_line = ""
+        words = dc.split()
+        
+        for word in words:
+            test_line = current_line + " " + word if current_line else word
+            test_bbox = draw.textbbox((0, 0), test_line, font=font_info)
+            test_width = test_bbox[2] - test_bbox[0]
+            
+            if test_width <= max_dc_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    dc_lines.append(current_line)
+                current_line = word
+        
+        if current_line:
+            dc_lines.append(current_line)
         
         # Đo kích thước text
-        ten_bbox = draw.textbbox((0, 0), ten.upper(), font=font_ten)
-        info_bbox = draw.textbbox((0, 0), f"Giờ mở cửa: {gio}", font=font_info)
-        dc_bbox = draw.textbbox((0, 0), dc, font=font_info)
-        
+        ten_bbox = draw.textbbox((0, 0), ten_text, font=font_ten)
         ten_width = ten_bbox[2] - ten_bbox[0]
         ten_height = ten_bbox[3] - ten_bbox[1]
-        info_height = info_bbox[3] - info_bbox[1]
-        dc_height = dc_bbox[3] - dc_bbox[1]
         
-        total_height = ten_height + info_height + dc_height + 20
-        max_width = max(ten_width, info_bbox[2] - info_bbox[0] + 100, 
-                       dc_bbox[2] - dc_bbox[0] + 100)  # +100 cho icon pin
+        gio_bbox = draw.textbbox((0, 0), gio_text, font=font_info)
+        gio_width = gio_bbox[2] - gio_bbox[0]
+        gio_height = gio_bbox[3] - gio_bbox[1]
         
-        # Xác định vị trí theo layout
+        # Tính chiều rộng lớn nhất của địa chỉ
+        dc_line_widths = []
+        for line in dc_lines:
+            line_bbox = draw.textbbox((0, 0), line, font=font_info)
+            dc_line_widths.append(line_bbox[2] - line_bbox[0])
+        
+        dc_max_width = max(dc_line_widths) if dc_line_widths else 0
+        
+        # Kích thước icon pin
+        pin_size = int(28 * scale_factor / font_scale)
+        pin_width = pin_size + 15
+        
+        # Khoảng cách giữa các dòng
+        line_spacing = int(15 * scale_factor)
+        
+        # Tính tổng chiều cao
+        total_height = ten_height + gio_height + (len(dc_lines) * (font_size_info + 8)) + (line_spacing * 3)
+        
+        # Tính chiều rộng lớn nhất cho background
+        max_width = max(ten_width, gio_width + 30, dc_max_width + pin_width + 10)
+        
+        # === XÁC ĐỊNH VỊ TRÍ - TRÁNH TRUNG TÂM ===
+        
         if position == "bottom-left":
-            x = margin
-            y = height - total_height - margin * 2
-        elif position == "bottom-right":
-            x = width - max_width - margin
-            y = height - total_height - margin * 2
-        elif position == "top-center":
-            x = (width - max_width) // 2
-            y = margin * 2
-        elif position == "center":
-            x = (width - max_width) // 2
-            y = (height - total_height) // 2
-        elif position == "top-left":
-            x = margin
-            y = margin * 2
-        elif position == "bottom-center":
-            x = (width - max_width) // 2
-            y = height - total_height - margin * 2
-        else:  # bottom-left default
-            x = margin
-            y = height - total_height - margin * 2
+            # Góc dưới trái
+            x = base_margin
+            y = height - total_height - base_margin
         
-        # Vẽ background shape trên overlay
-        text_bbox = [x, y, x + max_width, y + total_height]
+        elif position == "bottom-right":
+            # Góc dưới phải
+            x = width - max_width - base_margin
+            y = height - total_height - base_margin
+        
+        elif position == "top-left":
+            # Góc trên trái
+            x = base_margin
+            y = base_margin
+        
+        elif position == "top-right":
+            # Góc trên phải
+            x = width - max_width - base_margin
+            y = base_margin
+        
+        elif position == "bottom-center":
+            # Dưới cùng, căn giữa nhưng sát mép dưới
+            x = (width - max_width) // 2
+            y = height - total_height - base_margin // 2
+        
+        elif position == "top-center-edge":
+            # Trên cùng, căn giữa nhưng sát mép trên
+            x = (width - max_width) // 2
+            y = base_margin // 2
+        
+        elif position == "left-center":
+            # Giữa bên trái
+            x = base_margin
+            y = (height - total_height) // 3  # Đặt ở 1/3 chiều cao, không phải chính giữa
+        
+        elif position == "right-center":
+            # Giữa bên phải
+            x = width - max_width - base_margin
+            y = (height - total_height) // 3  # Đặt ở 1/3 chiều cao
+        
+        else:
+            # Mặc định bottom-left
+            x = base_margin
+            y = height - total_height - base_margin
+        
+        # Đảm bảo không bị tràn ra ngoài ảnh
+        x = max(20, min(x, width - max_width - 20))
+        y = max(20, min(y, height - total_height - 20))
+        
+        # Điều chỉnh thêm để tránh vị trí trung tâm
+        # Nếu vị trí tính toán rơi vào vùng trung tâm (30-70% chiều rộng và cao)
+        center_x_start = width * 0.3
+        center_x_end = width * 0.7
+        center_y_start = height * 0.3
+        center_y_end = height * 0.7
+        
+        if (center_x_start < x + max_width/2 < center_x_end and 
+            center_y_start < y + total_height/2 < center_y_end):
+            # Nếu rơi vào trung tâm, đẩy ra góc gần nhất
+            if x < width/2:
+                x = base_margin  # Đẩy sang trái
+            else:
+                x = width - max_width - base_margin  # Đẩy sang phải
+            
+            if y < height/2:
+                y = base_margin  # Đẩy lên trên
+            else:
+                y = height - total_height - base_margin  # Đẩy xuống dưới
+        
+        # Vẽ background shape
+        padding = int(30 * scale_factor)
+        text_bbox = [x - padding, y - padding, x + max_width + padding, y + total_height + padding]
         draw_background_shape(overlay_draw, text_bbox, shape, color_theme)
         
         # Composite overlay lên ảnh
         img = Image.alpha_composite(img, overlay)
         draw = ImageDraw.Draw(img)
         
-        # Xác định màu text dựa trên theme
+        # Màu sắc
         text_color = "#FFFFFF" if color_theme["text_light"] else "#000000"
-        primary_color = color_theme["primary"]
+        hour_color = "#FFD700" if color_theme["text_light"] else "#FF8C00"
         secondary_text_color = "#E0E0E0" if color_theme["text_light"] else "#333333"
+        outline_color = (0, 0, 0) if color_theme["text_light"] else (255, 255, 255)
         
-        # Vẽ text
-        current_y = y + 10
+        # Vị trí bắt đầu vẽ text
+        current_y = y + 15
         
-        # Tên quán
-        if position in ["top-center", "center", "bottom-center"]:
+        # Căn chỉnh text theo vị trí
+        if position in ["bottom-center", "top-center-edge"]:
+            # Căn giữa cho các vị trí center
             text_x = x + (max_width - ten_width) // 2
+        elif position in ["left-center", "right-center"]:
+            # Căn trái cho vị trí bên cạnh
+            text_x = x + 20
         else:
-            text_x = x + 10
+            # Mặc định căn trái cho các vị trí góc
+            text_x = x + 20
+        
+        # Vẽ tên quán (có outline)
+        for offset_x, offset_y in [(-2,-2), (-2,2), (2,-2), (2,2)]:
+            draw.text((text_x + offset_x, current_y + offset_y), ten_text, 
+                     fill=outline_color, font=font_ten)
+        draw.text((text_x, current_y), ten_text, fill=text_color, font=font_ten)
+        
+        current_y += ten_height + line_spacing
+        
+        # Vẽ giờ mở cửa
+        draw.text((text_x, current_y), gio_text, fill=hour_color, font=font_info)
+        current_y += gio_height + line_spacing
+        
+        # Vẽ địa chỉ với icon pin
+        for i, line in enumerate(dc_lines):
+            if i == 0:
+                # Dòng đầu tiên: vẽ icon pin và text
+                pin_x = text_x + 7
+                pin_y = current_y + (font_size_info - pin_size) // 2
+                draw_location_pin(draw, pin_x, pin_y, size=pin_size, color_theme=color_theme)
+                # Vẽ text sau icon
+                text_after_pin_x = pin_x + pin_size + 15
+                draw.text((text_after_pin_x, current_y), line, fill=secondary_text_color, font=font_info)
+            else:
+                # Các dòng tiếp theo: thụt vào
+                indent = pin_size + 15
+                draw.text((text_x + indent, current_y), line, fill=secondary_text_color, font=font_info)
             
-        draw.text((text_x, current_y), ten.upper(), 
-                 fill=primary_color if shape == "highlight-stroke" else text_color, 
-                 font=font_ten)
-        current_y += ten_height + 10
+            current_y += font_size_info + 8
         
-        # Giờ mở cửa
-        draw.text((text_x, current_y), f"Giờ mở cửa: {gio}", 
-                 fill="#FFD700" if color_theme["text_light"] else "#FF8C00", 
-                 font=font_info)
-        current_y += info_height + 5
-        
-        # Địa chỉ với icon pin
-        pin_size = int(25 * scale_factor / font_scale)
-        draw_location_pin(draw, text_x - 5, current_y - 5, size=pin_size, color_theme=color_theme)
-        draw.text((text_x + pin_size + 10, current_y), dc, 
-                 fill=secondary_text_color, font=font_info)
-        
-        # Logo
+        # Logo (luôn đặt ở góc, tránh trung tâm)
         if os.path.exists(LOGO_PATH):
             try:
                 logo = Image.open(LOGO_PATH).convert("RGBA")
-                desired_width = int(110 * target_size[0] / 900.0)
+                desired_width = 300 
                 w_percent = desired_width / float(logo.width)
                 h_size = int(float(logo.height) * w_percent)
                 logo = logo.resize((desired_width, h_size), Image.Resampling.LANCZOS)
-                margin_logo = int(30 * target_size[0] / 900.0)
-                img.paste(logo, (width - logo.width - margin_logo, margin_logo), logo)
-            except Exception:
-                pass
-        
+                margin_logo = int(40 * target_size[0] / 900.0)  # Tăng margin cho logo to hơn
+                
+                # Logo luôn đặt ở góc trên phải
+                logo_layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
+                logo_x = width - logo.width - margin_logo  # Căn phải
+                logo_y = margin_logo  # Căn trên
+                
+                logo_layer.paste(logo, (logo_x, logo_y), logo)
+                img = Image.alpha_composite(img, logo_layer)
+            except Exception as e:
+                print(f"Lỗi khi thêm logo: {e}")
+
         return img.convert("RGB")
         
     except Exception as e:
+        print(f"Lỗi trong add_text_with_layout: {e}")
         img = ImageOps.fit(image_pil.convert("RGB"), target_size, centering=(0.5, 0.5))
         draw = ImageDraw.Draw(img)
         draw.text((50, 50), f"Lỗi: {str(e)[:100]}", fill="red")
         return img
+# Định nghĩa hàm load_font
+def load_font(size, font_path=None):
+    """Tải font với kích thước chỉ định"""
+    try:
+        if font_path and os.path.exists(font_path):
+            return ImageFont.truetype(font_path, size)
+        # Fallback font mặc định
+        return ImageFont.load_default()
+    except:
+        return ImageFont.load_default()
 
-def create_cover_image(background_img, quan_list, descriptions, target_size, color_theme, font_path=None):
-    """Tạo ảnh bìa cover với background là ảnh random và overlay text"""
+def draw_text_with_spacing(draw, position, text, font, fill, spacing=0):
+    """Vẽ text với khoảng cách giữa các chữ - GIÃN CÁCH ĐỀU"""
+    x, y = position
+    total_width = 0
+    
+    # Tính tổng chiều rộng của text với spacing
+    char_widths = []
+    for char in text:
+        bbox = draw.textbbox((0, 0), char, font=font)
+        char_width = bbox[2] - bbox[0]
+        char_widths.append(char_width)
+        total_width += char_width
+    
+    # Thêm spacing giữa các chữ
+    total_width += spacing * (len(text) - 1)
+    
+    # Vẽ từng chữ
+    current_x = x
+    for i, char in enumerate(text):
+        draw.text((current_x, y), char, fill=fill, font=font)
+        current_x += char_widths[i] + spacing
+def create_cover_image(background_img, quan_list, descriptions, target_size, color_theme, font_path=None, logo_path=None):
+    """Tạo ảnh bìa cover"""
     try:
         # Fit ảnh background
         img = ImageOps.fit(background_img.convert("RGB"), target_size, centering=(0.5, 0.5))
         img = img.convert("RGBA")
-        
-        # Tạo overlay tối NHẸ HƠN để vẫn thấy background
-        overlay = Image.new('RGBA', img.size, (0, 0, 0, 140))
+
+        # Overlay tối
+        overlay = Image.new('RGBA', img.size, (0, 0, 0, 180))
         img = Image.alpha_composite(img, overlay)
-        
-        # Tạo layer mới để vẽ text và shape
+
+        # Layer text
         text_layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
         draw = ImageDraw.Draw(text_layer)
+
+        # Font sizes
+        font_title = load_font(int(target_size[0] * 0.08), font_path)  # Tăng size title
+        font_body = load_font(int(target_size[0] * 0.04), font_path)
+        font_small = load_font(int(target_size[0] * 0.035), font_path)
+        font_number = load_font(int(target_size[0] * 0.045), font_path)
+
+        # Lấy màu từ color_theme
+        primary_color = color_theme.get("primary", "#FF6B6B")
         
-        # Font sizes - TĂNG MẠNH CHO COVER
-        font_title = load_font(int(target_size[0] * 0.08), font_path)  # Tăng từ 0.08 -> 0.12
-        font_subtitle = load_font(int(target_size[0] * 0.05), font_path)  # Tăng từ 0.045 -> 0.06
-        font_body = load_font(int(target_size[0] * 0.045), font_path)  # Tăng từ 0.035 -> 0.045
-        font_small = load_font(int(target_size[0] * 0.032), font_path)  # Tăng từ 0.025 -> 0.032
+        # Bộ màu phụ cho cover
+        cover_color_schemes = {
+            "Đỏ Đen": {"accent": "#FF4444", "highlight": "#FF8888", "secondary": "#FFD700"},
+            "Vàng Trắng": {"accent": "#FFD700", "highlight": "#FFE44D", "secondary": "#FF8C00"},
+            "Xanh lá Đen": {"accent": "#4CAF50", "highlight": "#81C784", "secondary": "#FFD700"},
+            "Xanh dương Đen": {"accent": "#2196F3", "highlight": "#64B5F6", "secondary": "#FFD700"},
+            "Tím Đen": {"accent": "#9C27B0", "highlight": "#CE93D8", "secondary": "#FFD700"},
+            "Cam Trắng": {"accent": "#FF9800", "highlight": "#FFB74D", "secondary": "#FF5722"},
+            "Hồng Pastel": {"accent": "#E91E63", "highlight": "#F48FB1", "secondary": "#FFD700"},
+            "Xanh Mint": {"accent": "#009688", "highlight": "#4DB6AC", "secondary": "#FFD700"},
+            "Sang Trọng": {"accent": "#C0A080", "highlight": "#D4B896", "secondary": "#FFD700"},
+            "Hiện Đại": {"accent": "#00BCD4", "highlight": "#4DD0E1", "secondary": "#FFEB3B"},
+            "Năng Động": {"accent": "#FF5722", "highlight": "#FF8A65", "secondary": "#FFC107"},
+            "Tinh Tế": {"accent": "#795548", "highlight": "#A1887F", "secondary": "#FFD700"},
+        }
         
-        # Màu sắc từ theme
-        primary_color = color_theme["primary"]
-        text_color = "#FFFFFF" if color_theme["text_light"] else "#000000"
-        secondary_color = "#FFD700" if color_theme["text_light"] else "#FF8C00"
+        theme_name = color_theme.get("name", "Đỏ Đen")
+        cover_colors = cover_color_schemes.get(theme_name, cover_color_schemes["Đỏ Đen"])
         
-        # Tiêu đề chính
+        primary_rgb = hex_to_rgb(cover_colors["accent"])
+        highlight_rgb = hex_to_rgb(cover_colors["highlight"])
+        secondary_rgb = hex_to_rgb(cover_colors["secondary"])
+
+        # ===== TITLE =====
         title_text = "KHÁM PHÁ ĐÀ LẠT"
-        subtitle_text = f"Bộ sưu tập {len(quan_list)} địa điểm tuyệt vời"
         
-        # Vẽ tiêu đề với background
         title_bbox = draw.textbbox((0, 0), title_text, font=font_title)
-        title_width = title_bbox[2] - title_bbox[0]
-        title_height = title_bbox[3] - title_bbox[1]
-        title_x = (target_size[0] - title_width) // 2
-        title_y = target_size[1] // 6  # Đưa lên cao hơn một chút
-        
-        # Background cho title - to hơn
-        padding = 50
+        title_w = title_bbox[2] - title_bbox[0]
+        title_h = title_bbox[3] - title_bbox[1]
+
+        title_x = (target_size[0] - title_w) // 2
+        title_y = int(target_size[1] * 0.1)  # Dịch xuống một chút
+
+        # Khung title
         draw.rounded_rectangle(
-            [title_x - padding, title_y - padding, 
-             title_x + title_width + padding, title_y + title_height + padding],
-            radius=30,
-            fill=(0, 0, 0, 230)
+            [title_x - 50, title_y - 45, title_x + title_w + 50, title_y + title_h + 45],
+            radius=35,
+            fill=(0, 0, 0, 200),
+            outline=primary_rgb,
+            width=3
         )
         
-        # Thêm outline cho title
-        for offset_x, offset_y in [(-3,-3), (-3,3), (3,-3), (3,3)]:
-            draw.text((title_x + offset_x, title_y + offset_y), title_text, 
-                     fill=(0, 0, 0), font=font_title)
-        draw.text((title_x, title_y), title_text, fill=primary_color, font=font_title)
+        # Hiệu ứng glow
+        for offset in range(3, 0, -1):
+            draw.text((title_x, title_y - offset), title_text, fill=(*primary_rgb, 100), font=font_title)
         
-        # Subtitle - TĂNG KHOẢNG CÁCH
-        subtitle_bbox = draw.textbbox((0, 0), subtitle_text, font=font_subtitle)
-        subtitle_width = subtitle_bbox[2] - subtitle_bbox[0]
-        subtitle_x = (target_size[0] - subtitle_width) // 2
-        subtitle_y = title_y + title_height + 70  # Tăng khoảng cách từ 50 -> 80
-        
-        draw.text((subtitle_x, subtitle_y), subtitle_text, 
-                 fill=text_color, font=font_subtitle)
-        
-        # Danh sách quán - TĂNG KHOẢNG CÁCH GIỮA CÁC ITEM
-        y_start = target_size[1] // 3  # Điều chỉnh vị trí bắt đầu
+        draw.text((title_x, title_y), title_text, fill=primary_rgb, font=font_title)
+
+        desc_y = title_y + title_h + 80  # Tăng khoảng cách sau title
+            
+        # ===== LIST với khoảng cách lớn hơn =====
+        start_y = desc_y + 60  # Tăng khoảng cách sau description
+        item_height = 120  # Tăng chiều cao mỗi item
         max_items = min(5, len(quan_list))
-        
+
+        # Tham số thiết kế
+        circle_r = 35  # Tăng kích thước vòng tròn
+        padding_x = 45
+        padding_y = 20
+
+        # Tìm chiều rộng lớn nhất của tên quán
+        max_name_width = 0
         for i in range(max_items):
-            y_offset = y_start + i * 150  # Tăng spacing từ 120 -> 150
+            name_text = quan_list[i].upper()
+            name_bbox = draw.textbbox((0, 0), name_text, font=font_body)
+            name_w = name_bbox[2] - name_bbox[0]
+            max_name_width = max(max_name_width, name_w)
+
+        # Tổng chiều rộng của 1 item
+        total_item_width = (circle_r * 2) + 30 + (max_name_width + padding_x * 2)
+        center_start_x = (target_size[0] - total_item_width) // 2
+
+        for i in range(max_items):
+            y_pos = start_y + i * (item_height + 25)  # Tăng khoảng cách giữa các item
             
-            # Vẽ background cho mỗi item - TO HƠN
-            item_width = int(target_size[0] * 0.8)  # Rộng hơn từ 0.75 -> 0.8
-            item_height = 80  # Cao hơn từ 100 -> 120
-            item_x = int(target_size[0] * 0.1)  # Căn giữa hơn
-            item_y = y_offset - 10
-            
-            draw.rounded_rectangle(
-                [item_x, item_y, item_x + item_width, item_y + item_height],
-                radius=25,
-                fill=(0, 0, 0, 200)
+            if y_pos + item_height > target_size[1] - 140:
+                break
+
+            # Vòng tròn số thứ tự
+            circle_x = center_start_x + circle_r
+            circle_y = y_pos + item_height // 2
+
+            # Bóng đổ
+            draw.ellipse(
+                [circle_x - circle_r - 3, circle_y - circle_r - 3,
+                 circle_x + circle_r + 3, circle_y + circle_r + 3],
+                fill=(0, 0, 0, 100)
             )
             
-            # Số thứ tự với màu primary - TO HƠN
-            number_x = int(target_size[0] * 0.14)
-            number_y = y_offset + 40
-            draw.ellipse([number_x-35, number_y-35, number_x+35, number_y+35], 
-                        fill=primary_color)
-            draw.text((number_x-15, number_y-22), str(i+1), 
-                     fill="#FFFFFF" if color_theme["text_light"] else "#000000", 
-                     font=font_subtitle)
-            
-            # Tên quán - TĂNG KHOẢNG CÁCH VỚI SỐ
-            text_x = number_x + 70
-            text_y = y_offset + 15
-            
-            # Tính toán chiều cao text để căn chỉnh
-            ten_bbox = draw.textbbox((0, 0), quan_list[i], font=font_body)
-            ten_height = ten_bbox[3] - ten_bbox[1]
-            
-            draw.text((text_x, text_y), quan_list[i], fill=text_color, font=font_body)
-            
-            # Mô tả - TĂNG KHOẢNG CÁCH VỚI TÊN
-            if i < len(descriptions) and descriptions[i]:
-                desc_text = descriptions[i][:80] + "..." if len(descriptions[i]) > 80 else descriptions[i]
-                desc_y = text_y + ten_height + 15  # Tăng khoảng cách
-                draw.text((text_x, desc_y), desc_text, 
-                         fill=secondary_color, font=font_small)
+            # Vòng tròn chính
+            draw.ellipse(
+                [circle_x - circle_r, circle_y - circle_r,
+                 circle_x + circle_r, circle_y + circle_r],
+                fill=primary_rgb,
+                outline=highlight_rgb,
+                width=4
+            )
+
+            # Số thứ tự
+            number_text = str(i + 1)
+            left, top, right, bottom = draw.textbbox((0, 0), number_text, font=font_number)
+            tw = right - left
+            th = bottom - top
+            number_x = circle_x - tw // 2
+            number_y = circle_y - th // 2
+            draw.text((number_x, number_y), number_text, fill=(255, 255, 255), font=font_number)
+
+            # Tên quán
+            name_text = quan_list[i].upper()
+            name_bbox = draw.textbbox((0, 0), name_text, font=font_body)
+            name_w = name_bbox[2] - name_bbox[0]
+            name_h = name_bbox[3] - name_bbox[1]
+
+            name_bg_w = name_w + padding_x * 2
+            name_bg_h = name_h + padding_y * 2
+
+            name_bg_x = circle_x + circle_r + 30
+            name_bg_y = y_pos + (item_height - name_bg_h) // 2
+
+            # Khung nền cho tên quán
+            draw.rounded_rectangle(
+                [name_bg_x, name_bg_y,
+                 name_bg_x + name_bg_w, name_bg_y + name_bg_h],
+                radius=35,
+                fill=(0, 0, 0, 220),
+                outline=(primary_rgb[0], primary_rgb[1], primary_rgb[2], 150),
+                width=2
+            )
+
+            # Thanh highlight bên trái
+            draw.rounded_rectangle(
+                [name_bg_x, name_bg_y + 12,
+                 name_bg_x + 6, name_bg_y + name_bg_h - 12],
+                radius=3,
+                fill=primary_rgb
+            )
+
+            # Vẽ text với spacing
+            text_x = name_bg_x + padding_x + 15
+            text_y = name_bg_y + padding_y
+            draw_text_with_spacing(draw, (text_x, text_y), name_text, font_body, (255, 255, 255), spacing=10)  # Tăng spacing
+
+        # ===== FOOTER =====
+        footer_text = "Riviu • Khám phá Đà Lạt cùng chúng tôi"
+        f_bbox = draw.textbbox((0, 0), footer_text, font=font_body)
+        f_w = f_bbox[2] - f_bbox[0]
+        f_h = f_bbox[3] - f_bbox[1]
+        f_x = (target_size[0] - f_w) // 2
+        f_y = target_size[1] - 90  # Dịch lên một chút
         
-        # Footer - TĂNG KHOẢNG CÁCH
-        footer_text = "Riviu AI • Khám phá Đà Lạt cùng chúng tôi"
-        footer_bbox = draw.textbbox((0, 0), footer_text, font=font_body)
-        footer_width = footer_bbox[2] - footer_bbox[0]
-        footer_x = (target_size[0] - footer_width) // 2
-        footer_y = target_size[1] - 180  # Đưa lên cao hơn để không bị che
-        
-        # Footer background
+        # Footer
         draw.rounded_rectangle(
-            [footer_x - 30, footer_y - 15, footer_x + footer_width + 30, footer_y + footer_bbox[3] + 15],
-            radius=20,
-            fill=(0, 0, 0, 220)
+            [f_x - 40, f_y - 20, f_x + f_w + 40, f_y + f_h + 20],
+            radius=25,
+            fill=(0, 0, 0, 180),
+            outline=primary_rgb,
+            width=2
         )
-        draw.text((footer_x, footer_y), footer_text, fill=primary_color, font=font_body)
-        
-        # COMPOSITE TEXT LAYER LÊN ẢNH GỐC
-        img = Image.alpha_composite(img, text_layer)
-        img = img.convert("RGB")
-        
-        # Logo - kích thước 110px
-        if os.path.exists(LOGO_PATH):
+        draw.text((f_x, f_y), footer_text, fill=primary_rgb, font=font_body)
+
+        # Merge layer text với background
+        img = Image.alpha_composite(img, text_layer).convert("RGB")
+
+        # ===== LOGO =====
+        if logo_path and os.path.exists(logo_path):
             try:
-                logo = Image.open(LOGO_PATH).convert("RGBA")
-                desired_width = 110
-                w_percent = desired_width / float(logo.width)
-                h_size = int(float(logo.height) * w_percent)
-                logo = logo.resize((desired_width, h_size), Image.Resampling.LANCZOS)
-                
-                logo_layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
-                logo_layer.paste(logo, (target_size[0] - logo.width - 40, 40), logo)
-                img = img.convert("RGBA")
-                img = Image.alpha_composite(img, logo_layer)
-                img = img.convert("RGB")
-            except:
-                pass
-        
+                logo = Image.open(logo_path).convert("RGBA")
+                w = 300
+                ratio = w / logo.width
+                h = int(logo.height * ratio)
+                logo = logo.resize((w, h), Image.Resampling.LANCZOS)
+                layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
+                margin = 40
+                layer.paste(logo, (target_size[0] - w - margin, margin), logo)
+                img = Image.alpha_composite(img.convert("RGBA"), layer).convert("RGB")
+            except Exception as e:
+                print(f"Lỗi khi thêm logo: {e}")
+
         return img
-        
+
     except Exception as e:
         print(f"Lỗi tạo cover: {e}")
-        img = Image.new('RGB', target_size, color=(20, 20, 30))
+        import traceback
+        traceback.print_exc()
+        img = Image.new('RGB', target_size, color=(30, 30, 40))
         draw = ImageDraw.Draw(img)
         draw.text((target_size[0]//2, target_size[1]//2), f"COVER - {len(quan_list)} quán", 
-                 fill="white", font=load_font(50, font_path))
+                 fill=(255, 255, 255), anchor="mm")
         return img
 
-def add_text_with_layout(image_pil, ten, gio, dc, target_size, layout_config, color_theme, font_path=None, font_scale=1.0):
-    """
-    Thêm text vào ảnh với layout, hình dạng nền và COLOR THEME được chỉ định
-    Text to và rõ hơn, không bị dính
-    """
-    try:
-        img = ImageOps.fit(image_pil.convert("RGB"), target_size, centering=(0.5, 0.5))
-        
-        # Tạo overlay cho background shape nếu cần
-        overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
-        overlay_draw = ImageDraw.Draw(overlay)
-        
-        # Convert to RGBA for compositing
-        img = img.convert("RGBA")
-        draw = ImageDraw.Draw(img)
-        
-        width, height = img.size
-        scale_factor = (target_size[0] / 900.0) * font_scale
-        
-        # Font sizes - GIỮ KÍCH THƯỚC TO
-        font_size_ten = max(45, int(75 * scale_factor))
-        font_size_info = max(28, int(36 * scale_factor))
-        
-        font_ten = load_font(font_size_ten, font_path)
-        font_info = load_font(font_size_info, font_path)
-        
-        position = layout_config.get("position", "bottom-left")
-        shape = layout_config.get("shape", "rounded-rectangle")
-        
-        # Tính toán vị trí text
-        margin = int(50 * scale_factor / font_scale)
-        
-        # Đo kích thước text
-        ten_bbox = draw.textbbox((0, 0), ten.upper(), font=font_ten)
-        info_bbox = draw.textbbox((0, 0), f"Giờ mở cửa: {gio}", font=font_info)
-        dc_bbox = draw.textbbox((0, 0), dc, font=font_info)
-        
-        ten_width = ten_bbox[2] - ten_bbox[0]
-        ten_height = ten_bbox[3] - ten_bbox[1]
-        info_height = info_bbox[3] - info_bbox[1]
-        dc_height = dc_bbox[3] - dc_bbox[1]
-        
-        # TĂNG KHOẢNG CÁCH GIỮA CÁC DÒNG
-        line_spacing = 25  # Khoảng cách cố định giữa các dòng
-        total_height = ten_height + info_height + dc_height + line_spacing * 3
-        
-        max_width = max(ten_width, info_bbox[2] - info_bbox[0] + 120, 
-                       dc_bbox[2] - dc_bbox[0] + 120)
-        
-        # Xác định vị trí theo layout
-        if position == "bottom-left":
-            x = margin
-            y = height - total_height - margin * 2
-        elif position == "bottom-right":
-            x = width - max_width - margin
-            y = height - total_height - margin * 2
-        elif position == "top-center":
-            x = (width - max_width) // 2
-            y = margin * 2
-        elif position == "center":
-            x = (width - max_width) // 2
-            y = (height - total_height) // 2
-        elif position == "top-left":
-            x = margin
-            y = margin * 2
-        elif position == "bottom-center":
-            x = (width - max_width) // 2
-            y = height - total_height - margin * 2
-        else:
-            x = margin
-            y = height - total_height - margin * 2
-        
-        # Vẽ background shape trên overlay
-        text_bbox = [x, y, x + max_width, y + total_height]
-        draw_background_shape(overlay_draw, text_bbox, shape, color_theme)
-        
-        # Composite overlay lên ảnh
-        img = Image.alpha_composite(img, overlay)
-        draw = ImageDraw.Draw(img)
-        
-        # Xác định màu text dựa trên theme
-        text_color = "#FFFFFF" if color_theme["text_light"] else "#000000"
-        primary_color = color_theme["primary"]
-        secondary_text_color = "#E0E0E0" if color_theme["text_light"] else "#333333"
-        
-        # Vẽ text với khoảng cách rõ ràng
-        current_y = y + line_spacing
-        
-        # Tên quán
-        if position in ["top-center", "center", "bottom-center"]:
-            text_x = x + (max_width - ten_width) // 2
-        else:
-            text_x = x + 20
-        
-        # Vẽ text với hiệu ứng đậm hơn
-        if shape == "highlight-stroke":
-            draw.text((text_x, current_y), ten.upper(), fill=primary_color, font=font_ten)
-        else:
-            # Thêm outline nhẹ cho text
-            outline_color = (0, 0, 0) if color_theme["text_light"] else (255, 255, 255)
-            for offset_x, offset_y in [(-2,-2), (-2,2), (2,-2), (2,2)]:
-                draw.text((text_x + offset_x, current_y + offset_y), ten.upper(), 
-                         fill=outline_color, font=font_ten)
-            draw.text((text_x, current_y), ten.upper(), fill=text_color, font=font_ten)
-        
-        # Tăng current_y với khoảng cách lớn
-        current_y += ten_height + line_spacing
-        
-        # Giờ mở cửa
-        hour_color = "#FFD700" if color_theme["text_light"] else "#FF8C00"
-        draw.text((text_x, current_y), f"Giờ mở cửa: {gio}", fill=hour_color, font=font_info)
-        current_y += info_height + line_spacing
-        
-        # Địa chỉ với icon pin
-        pin_size = int(30 * scale_factor / font_scale)
-        draw_location_pin(draw, text_x - 5, current_y - 5, size=pin_size, color_theme=None)
-        draw.text((text_x + pin_size + 15, current_y), dc, fill=secondary_text_color, font=font_info)
-        
-        # Logo - kích thước cố định 110px
-        if os.path.exists(LOGO_PATH):
-            try:
-                logo = Image.open(LOGO_PATH).convert("RGBA")
-                desired_width = 110
-                w_percent = desired_width / float(logo.width)
-                h_size = int(float(logo.height) * w_percent)
-                logo = logo.resize((desired_width, h_size), Image.Resampling.LANCZOS)
-                margin_logo = int(30 * target_size[0] / 900.0)
-                
-                logo_layer = Image.new('RGBA', img.size, (0, 0, 0, 0))
-                logo_layer.paste(logo, (width - logo.width - margin_logo, margin_logo), logo)
-                img = Image.alpha_composite(img, logo_layer)
-            except Exception:
-                pass
-        
-        return img.convert("RGB")
-        
-    except Exception as e:
-        img = ImageOps.fit(image_pil.convert("RGB"), target_size, centering=(0.5, 0.5))
-        draw = ImageDraw.Draw(img)
-        draw.text((50, 50), f"Lỗi: {str(e)[:100]}", fill="red")
-        return img
-
+# Hàm hỗ trợ hex to rgb
+def hex_to_rgb(hex_color):
+    """Chuyển đổi hex color sang rgb tuple"""
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
 # --- GOOGLE DRIVE (giữ nguyên) ---
 def extract_folder_id(url: str) -> Optional[str]:
     patterns = [r'/folders/([a-zA-Z0-9_-]+)', r'id=([a-zA-Z0-9_-]+)']
@@ -727,13 +929,52 @@ def read_excel_with_sheets(uploaded_file) -> Dict[str, pd.DataFrame]:
         return {sheet: pd.read_excel(xl, sheet_name=sheet) for sheet in xl.sheet_names}
 
 def find_required_columns(df: pd.DataFrame) -> Tuple[str, str, str, str, str, str]:
+    """Tìm cột phù hợp với các tên cột khác nhau trong file Excel"""
     cols = {normalize_text(c): c for c in df.columns}
-    ten = cols.get('ten_quan', cols.get('ten quan', None))
-    dia = cols.get('dia_chi', cols.get('dia chi', None))
-    gio = cols.get('gio_mo_cua', cols.get('thoi gian mo cua', None))
-    doi = cols.get('doi_tac', cols.get('doi tac', None))
-    mon = cols.get('mon_an_noi_bat', cols.get('mon an noi bat', cols.get('dac_san', cols.get('dac san', None))))
-    style = cols.get('phong_cach', cols.get('phong cach', cols.get('style', None)))
+    
+    # Tìm cột Tên quán (hỗ trợ nhiều tên cột khác nhau)
+    ten = None
+    for key in ['ten_quan', 'ten quan', 'tên quán', 'ten', 'tên', 'tên địa điểm', 'TÊN ĐỊA ĐIỂM']:
+        if key in cols:
+            ten = cols[key]
+            break
+    
+    # Tìm cột Địa chỉ
+    dia = None
+    for key in ['dia_chi', 'dia chi', 'địa chỉ', 'diachi', 'address', 'địa chỉ', 'ĐỊA CHỈ']:
+        if key in cols:
+            dia = cols[key]
+            break
+    
+    # Tìm cột Giờ mở cửa
+    gio = None
+    for key in ['gio_mo_cua', 'gio mo cua', 'giờ mở cửa', 'thoi gian mo cua', 
+                'thời gian mở cửa', 'gio', 'GIỜ MỞ CỬA']:
+        if key in cols:
+            gio = cols[key]
+            break
+    
+    # Tìm cột Đối tác
+    doi = None
+    for key in ['doi_tac', 'doi tac', 'đối tác', 'doitac', 'ĐỐI TÁC CÔNG TY', 'Doi_tac']:
+        if key in cols:
+            doi = cols[key]
+            break
+    
+    # Tìm cột Món ăn nổi bật
+    mon = None
+    for key in ['mon_an_noi_bat', 'mon an noi bat', 'món ăn nổi bật', 'mon an', 'mon', 'Noi_bat']:
+        if key in cols:
+            mon = cols[key]
+            break
+    
+    # Tìm cột Phong cách
+    style = None
+    for key in ['phong_cach', 'phong cach', 'phong cách', 'style', 'PHONG CÁCH']:
+        if key in cols:
+            style = cols[key]
+            break
+    
     return ten, dia, gio, doi, mon, style
 
 # --- ẢNH TỪ ZIP (KHÔNG GIẢI NÉN RA Ổ ĐĨA) ---
@@ -894,6 +1135,64 @@ def generate_tiktok_caption(names: List[str], descriptions: List[str], api_key: 
         except:
             pass
         return f"TOP QUÁN CAFE ĐÀ LẠT ĐẸP QUÊN LỐI VỀ\nKhám phá ngay những quán cafe Đà Lạt siêu xinh.\n{hashtags}"
+#Xử lý excel
+def process_sheet_data(df: pd.DataFrame, sheet_name: str) -> pd.DataFrame:
+    """Xử lý dữ liệu theo từng sheet"""
+    df_processed = df.copy()
+    
+    if sheet_name == "Quan_an":
+        if 'Mo_hinh' in df.columns:
+            st.info(f"🍽️ Loại hình: {df['Mo_hinh'].unique().tolist()}")
+    
+    elif sheet_name == "Cafe":
+        if 'MÓN ĂN NỔI BẬT' in df.columns:
+            df_processed = df_processed.rename(columns={'MÓN ĂN NỔI BẬT': 'Mon_an_noi_bat'})
+    
+    elif sheet_name == "Khu_du_lich":
+        if 'Noi_bat' in df.columns:
+            df_processed = df_processed.rename(columns={'Noi_bat': 'Mon_an_noi_bat'})
+    
+    elif sheet_name == "Homestay":
+        if 'Gia' in df.columns and 'Gio_mo_cua' not in df.columns:
+            df_processed['Gio_mo_cua'] = 'Check-in: 14:00, Check-out: 12:00'
+    
+    elif sheet_name == "Check_in":
+        if 'Gia' in df.columns and 'Gio_mo_cua' not in df.columns:
+            df_processed['Gio_mo_cua'] = 'Mở cửa cả ngày'
+    
+    elif sheet_name == "Địa điểm lịch sử":
+        # Đổi tên cột TÊN ĐỊA ĐIỂM thành Ten_quan
+        if 'TÊN ĐỊA ĐIỂM' in df.columns:
+            df_processed = df_processed.rename(columns={'TÊN ĐỊA ĐIỂM': 'Ten_quan'})
+        if 'ĐỊA CHỈ' in df.columns:
+            df_processed = df_processed.rename(columns={'ĐỊA CHỈ': 'Dia_chi'})
+        if 'GIỜ MỞ CỬA' in df.columns:
+            df_processed = df_processed.rename(columns={'GIỜ MỞ CỬA': 'Gio_mo_cua'})
+        if 'ĐỐI TÁC CÔNG TY' in df.columns:
+            df_processed = df_processed.rename(columns={'ĐỐI TÁC CÔNG TY': 'Doi_tac'})
+    
+    elif sheet_name == "Dich_vu":
+        if 'Loai_dich_vu' in df.columns:
+            df_processed['Mon_an_noi_bat'] = df_processed['Loai_dich_vu']
+    
+    elif sheet_name == "Choi_đem":
+        if 'Loai_dich_vu' in df.columns:
+            df_processed['Mon_an_noi_bat'] = df_processed['Loai_dich_vu']
+        if 'Gio_mo_cua' not in df.columns:
+            df_processed['Gio_mo_cua'] = '19:00 - 02:00'
+    
+    elif sheet_name == "Xe_khach":
+        if 'Gio_mo_cua' not in df.columns:
+            df_processed['Gio_mo_cua'] = 'Liên hệ trực tiếp'
+    
+    elif sheet_name == "Hoat_dong":
+        # Sheet hoạt động không có địa chỉ và giờ, tạo dữ liệu mẫu
+        if 'Gio_mo_cua' not in df.columns:
+            df_processed['Gio_mo_cua'] = 'Theo lịch trình'
+        if 'Dia_chi' not in df.columns:
+            df_processed['Dia_chi'] = 'Đà Lạt'
+    
+    return df_processed
 
 def generate_facebook_caption(names: List[str], descriptions: List[str], api_key: str, provider: str = 'gemini') -> str:
     names_str = ", ".join(names)
@@ -977,14 +1276,38 @@ ten_col = dia_col = gio_col = doi_col = mon_col = style_col = None
 if excel_file:
     sheets = read_excel_with_sheets(excel_file)
     sheet_names = list(sheets.keys())
-    default_idx = sheet_names.index('Quan_an') if 'Quan_an' in sheet_names else 0
-    selected_sheet = st.selectbox("Chọn sheet chứa dữ liệu quán:", sheet_names, index=default_idx)
+    
+    # Ưu tiên các sheet có dữ liệu
+    priority_sheets = ['Quan_an', 'Cafe', 'Khu_du_lich', 'Địa điểm lịch sử', 'Dich_vu']
+    default_idx = 0
+    for i, sheet in enumerate(sheet_names):
+        if sheet in priority_sheets:
+            default_idx = i
+            break
+    
+    selected_sheet = st.selectbox("Chọn sheet chứa dữ liệu:", sheet_names, index=default_idx)
     df = sheets[selected_sheet].copy()
+    
+    # Xử lý dữ liệu theo từng sheet
+    df = process_sheet_data(df, selected_sheet)
+    
     st.success(f"✅ Đã đọc sheet `{selected_sheet}` ({len(df)} dòng)")
-
+    
+    # Tìm cột sau khi đã xử lý
     ten_col, dia_col, gio_col, doi_col, mon_col, style_col = find_required_columns(df)
-    if not all([ten_col, dia_col, gio_col]):
-        st.error("❌ Thiếu cột bắt buộc (Ten_quan, Dia_chi, Gio_mo_cua).")
+    
+    # Kiểm tra các cột bắt buộc
+    missing_cols = []
+    if not ten_col:
+        missing_cols.append("Tên quán")
+    if not dia_col:
+        missing_cols.append("Địa chỉ")
+    if not gio_col:
+        missing_cols.append("Giờ mở cửa")
+    
+    if missing_cols:
+        st.error(f"❌ Thiếu cột bắt buộc: {', '.join(missing_cols)}")
+        st.info("📋 Các cột hiện có trong file: " + ", ".join(df.columns.tolist()))
         st.stop()
     
     # Hiển thị preview
@@ -998,9 +1321,11 @@ if excel_file:
     
     st.dataframe(df[preview_cols].head())
     
+    # Thông báo về các cột tùy chọn
     if not mon_col:
-        st.info("💡 Tip: Thêm cột 'Mon_an_noi_bat' và 'Phong_cach' để AI tạo mô tả hay hơn!")
-
+        st.info("💡 Tip: Thêm cột 'Mon_an_noi_bat' để AI tạo mô tả hay hơn!")
+    if not style_col:
+        st.info("💡 Tip: Thêm cột 'Phong_cach' để AI tạo mô tả chính xác hơn!")
 # --- BLOCK 2: NGUỒN ẢNH ---
 st.markdown("### 🖼️ 2. Nguồn ảnh (ZIP hoặc Drive Folder)")
 src_option = st.radio("Chọn cách cung cấp ảnh:", ["Upload file ZIP", "Link Google Drive Folder"], horizontal=True)
