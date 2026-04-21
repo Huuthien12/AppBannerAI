@@ -39,17 +39,20 @@ HARD_HASHTAGS = "#riviudalat #dalat #dalatreview"
 
 # Danh sách font ưu tiên có hỗ trợ tiếng Việt
 FONT_PATHS = [
+ # Font an toàn - ưu tiên hàng đầu
+    "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-    "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
     "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
-    "/usr/share/fonts/truetype/freefont/FreeSerif.ttf",
-    "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
-    "C:/Windows/Fonts/Arial.ttf",
-    "C:/Windows/Fonts/Times.ttf",
-    "C:/Windows/Fonts/Calibri.ttf",
     "/Library/Fonts/Arial.ttf",
     "/System/Library/Fonts/Supplemental/Arial.ttf",
+    
+    # Font Windows - có thể lỗi, để cuối
+    "C:/Windows/Fonts/arial.ttf",
+    "C:/Windows/Fonts/Calibri.ttf",
+    "C:/Windows/Fonts/Times.ttf",  # Dễ lỗi nhất
+    
+    # Fallback - rủi ro cao
     "arial.ttf", "Arial.ttf", "DejaVuSans.ttf"
 ]
 
@@ -1693,7 +1696,9 @@ if st.button("🚀 XUẤT NỘI DUNG HÀNG LOẠT", type="primary", use_containe
                 current_font = random.choice(all_fonts)
             else:
                 current_font = selected_font
-                fixed_font_scale = font_scale
+
+            # ✅ Luôn định nghĩa fixed_font_scale
+            fixed_font_scale = font_scale
             # Tạo mô tả ngắn cho từng quán bằng AI
             for ten in selected:
                 if ai_enabled:
@@ -1779,7 +1784,7 @@ if st.button("🚀 XUẤT NỘI DUNG HÀNG LOẠT", type="primary", use_containe
                     banner = add_text_with_layout(img, ten, gio, dc, target_size,
                             img_layout, img_color_theme,
                             font_path=font_path, 
-                            font_scale=fixed_font_scale,
+                            font_scale= font_scale,
                             artistic_font=current_font,
                             font_style=font_style)
                 except Exception as e:
