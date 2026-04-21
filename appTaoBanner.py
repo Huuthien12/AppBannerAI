@@ -30,7 +30,8 @@ if 'caption_df' not in st.session_state:
     st.session_state.caption_df = None
 if 'partner_logs' not in st.session_state:
     st.session_state.partner_logs = {}
-
+if 'use_font_combo' not in st.session_state:
+    st.session_state.use_font_combo = False
 # --- CẤU HÌNH ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = tempfile.mkdtemp(prefix="riviu_")
@@ -39,38 +40,109 @@ HARD_HASHTAGS = "#riviudalat #dalat #dalatreview"
 
 # Danh sách font ưu tiên có hỗ trợ tiếng Việt
 FONT_PATHS = [
- # Font an toàn - ưu tiên hàng đầu
+    # === FONT AN TOÀN - HỖ TRỢ TIẾNG VIỆT ===
     "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
     "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
     "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+    
+    # === WINDOWS - CHỈ GIỮ FONT TỒN TẠI ===
+    "C:/Windows/Fonts/arial.ttf",
+    "C:/Windows/Fonts/Arial.ttf",
+    "C:/Windows/Fonts/calibri.ttf",
+    "C:/Windows/Fonts/Calibri.ttf",
+    "C:/Windows/Fonts/tahoma.ttf",
+    "C:/Windows/Fonts/Tahoma.ttf",
+    "C:/Windows/Fonts/verdana.ttf",
+    "C:/Windows/Fonts/Verdana.ttf",
+    "C:/Windows/Fonts/times.ttf",
+    
+    # === MacOS ===
     "/Library/Fonts/Arial.ttf",
     "/System/Library/Fonts/Supplemental/Arial.ttf",
     
-    # Font Windows - có thể lỗi, để cuối
-    "C:/Windows/Fonts/arial.ttf",
-    "C:/Windows/Fonts/Calibri.ttf",
-    "C:/Windows/Fonts/Times.ttf",  # Dễ lỗi nhất
-    
-    # Fallback - rủi ro cao
+    # === FALLBACK ===
     "arial.ttf", "Arial.ttf", "DejaVuSans.ttf"
 ]
+# ============================================================
+# DANH SÁCH FONT GOOGLE - CHỈ GIỮ FONT HỖ TRỢ TIẾNG VIỆT TỐT
+# ============================================================
+FONT_ARTISTIC = {
+    # ===== 🎨 SCRIPT - VIẾT TAY =====
+    "Allura": "https://github.com/google/fonts/raw/main/ofl/allura/Allura-Regular.ttf",
+    "Pacifico": "https://github.com/google/fonts/raw/main/ofl/pacifico/Pacifico-Regular.ttf",
+    
+    # ===== 👑 SERIF - SANG TRỌNG =====
+    "Cormorant Garamond": "https://github.com/google/fonts/raw/main/ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf",
+    
+    # ===== 📱 SANS-SERIF - HIỆN ĐẠI =====
+    "Raleway": "https://github.com/google/fonts/raw/main/ofl/raleway/Raleway%5Bwght%5D.ttf",
+    "Baloo 2": "https://github.com/google/fonts/raw/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf",
+    
+    # ===== FONT HỆ THỐNG =====
+    "Arial": None,
+    "Calibri": None,
+    "Candara": None,
+    "Tahoma": None,
+    "Verdana": None,
+}
 
+# ============================================================
+# COMBO FONT GỢI Ý THEO VIBE
+# ============================================================
+FONT_COMBOS = {
+    "🌿 Đà Lạt Chill": {
+        "title": ["Allura"],
+        "body": ["Calibri", "Tahoma"],
+        "highlight": ["Pacifico"]
+    },
+    "📰 Magazine Sang Trọng": {
+        "title": ["Cormorant Garamond"],
+        "body": ["Raleway", "Arial"],
+        "highlight": ["Allura"]
+    },
+    "📱 Hiện Đại Tối Giản": {
+        "title": ["Raleway", "Arial"],
+        "body": ["Calibri", "Tahoma"],
+        "highlight": ["Baloo 2"]
+    },
+    "🎨 Trẻ Trung Năng Động": {
+        "title": ["Pacifico", "Baloo 2"],
+        "body": ["Verdana", "Candara"],
+        "highlight": ["Allura"]
+    }
+}
+
+# ============================================================
+# DANH MỤC FONT CHO SIDEBAR
+# ============================================================
+FONT_CATEGORIES = {
+    "💻 Hệ thống (Cơ bản)": ["Arial", "Calibri", "Candara", "Tahoma", "Verdana"],
+    "🖋️ Script - Viết tay": ["Allura", "Pacifico"],
+    "👑 Serif - Sang trọng": ["Cormorant Garamond"],
+    "📱 Sans-serif - Hiện đại": ["Raleway", "Baloo 2"],
+}
 FONT_DOWNLOAD_URL = "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf"
-
+def get_all_fonts_list() -> List[str]:
+    """Trả về danh sách tất cả font có sẵn"""
+    all_fonts = []
+    for fonts in FONT_CATEGORIES.values():
+        all_fonts.extend(fonts)
+    return all_fonts
 # --- ĐỊNH NGHĨA LAYOUT VÀ HÌNH DẠNG NỀN ---
 TEXT_POSITIONS = [
     "bottom-left",      # Góc dưới trái
     "bottom-right",     # Góc dưới phải  
-    "top-left",         # Góc trên trái
-    "top-right",        # Góc trên phải (thêm mới)
+    "top-left",         # Góc trên trái       
     "bottom-center",    # Dưới cùng giữa
-    "top-center-edge",  # Trên cùng sát mép (thay thế top-center)
+    "top-center-edge",  # Trên cùng sát mép 
     "left-center",      # Giữa bên trái
-    "right-center"      # Giữa bên phải    # Dưới cùng giữa
 ]
 
 BACKGROUND_SHAPES = [
+    "auto-fit-box",      
+    "rounded-rectangle",
+    "rectangle",
     # Hình chữ nhật bo góc - an toàn nhất, text luôn vừa
     "rounded-rectangle",
     
@@ -110,40 +182,6 @@ BACKGROUND_SHAPES = [
     # Khung ngoặc - text dài
     "frame-bracket"
 ]
-# Danh sách font nghệ thuật (cần tải từ Google Fonts)
-FONT_ARTISTIC = {
-    # Serif - Sang trọng
-    "Playfair Display": "https://github.com/google/fonts/raw/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf",
-    "Cormorant Garamond": "https://github.com/google/fonts/raw/main/ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf",
-    "Libre Baskerville": "https://github.com/google/fonts/raw/main/ofl/librebaskerville/LibreBaskerville-Regular.ttf",
-    "DM Serif Display": "https://github.com/google/fonts/raw/main/ofl/dmserifdisplay/DMSerifDisplay-Regular.ttf",
-    "Prata": "https://github.com/google/fonts/raw/main/ofl/prata/Prata-Regular.ttf",
-    "Lora": "https://github.com/google/fonts/raw/main/ofl/lora/Lora%5Bwght%5D.ttf",
-    
-    # Sans-serif - Hiện đại
-    "Be Vietnam Pro": "https://github.com/google/fonts/raw/main/ofl/bevietnampro/BeVietnamPro%5Bwght%5D.ttf",
-    "Montserrat": "https://github.com/google/fonts/raw/main/ofl/montserrat/Montserrat%5Bwght%5D.ttf",
-    "Poppins": "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins%5Bwght%5D.ttf",
-    "Raleway": "https://github.com/google/fonts/raw/main/ofl/raleway/Raleway%5Bwght%5D.ttf",
-    "Rubik": "https://github.com/google/fonts/raw/main/ofl/rubik/Rubik%5Bwght%5D.ttf",
-    "Lexend": "https://github.com/google/fonts/raw/main/ofl/lexend/Lexend%5Bwght%5D.ttf",
-    "Barlow Condensed": "https://github.com/google/fonts/raw/main/ofl/barlowcondensed/BarlowCondensed%5Bwght%5D.ttf",
-    "Oswald": "https://github.com/google/fonts/raw/main/ofl/oswald/Oswald%5Bwght%5D.ttf",
-    
-    # Script - Viết tay
-    "Great Vibes": "https://github.com/google/fonts/raw/main/ofl/greatvibes/GreatVibes-Regular.ttf",
-    "Allura": "https://github.com/google/fonts/raw/main/ofl/allura/Allura-Regular.ttf",
-    "Satisfy": "https://github.com/google/fonts/raw/main/ofl/satisfy/Satisfy-Regular.ttf",
-    "Parisienne": "https://github.com/google/fonts/raw/main/ofl/parisienne/Parisienne-Regular.ttf",
-    "Sacramento": "https://github.com/google/fonts/raw/main/ofl/sacramento/Sacramento-Regular.ttf",
-    
-    # Stylized - Độc lạ
-    "Bungee": "https://github.com/google/fonts/raw/main/ofl/bungee/Bungee-Regular.ttf",
-    "Fredoka": "https://github.com/google/fonts/raw/main/ofl/fredoka/Fredoka%5Bwght%5D.ttf",
-    "Baloo 2": "https://github.com/google/fonts/raw/main/ofl/baloo2/Baloo2%5Bwght%5D.ttf",
-    "Comfortaa": "https://github.com/google/fonts/raw/main/ofl/comfortaa/Comfortaa%5Bwght%5D.ttf",
-    "Chakra Petch": "https://github.com/google/fonts/raw/main/ofl/chakrapetch/ChakraPetch%5Bwght%5D.ttf",
-}
 
 # Đường dẫn lưu font đã tải
 FONT_CACHE_DIR = os.path.join(TEMP_DIR, "fonts")
@@ -175,14 +213,26 @@ def download_google_font(font_name: str) -> Optional[str]:
     return None
 
 def get_artistic_font(font_name: str, size: int) -> ImageFont.FreeTypeFont:
-    """Lấy font nghệ thuật, nếu không có thì dùng fallback"""
+    """Lấy font nghệ thuật hoặc font hệ thống, nếu không có thì dùng fallback"""
+    
+    # Font hệ thống - không cần tải (CHỈ GIỮ FONT TỒN TẠI)
+    system_fonts = ["Arial", "Calibri", "Candara", "Tahoma", "Verdana"]
+    if font_name in system_fonts:
+        for path in FONT_PATHS:
+            if os.path.exists(path) and font_name.lower() in path.lower():
+                try:
+                    return ImageFont.truetype(path, size)
+                except:
+                    continue
+        return load_font(size)
+    
+    # Font Google Fonts
     font_path = download_google_font(font_name)
     if font_path:
         try:
             return ImageFont.truetype(font_path, size)
         except:
             pass
-    # Fallback về font mặc định
     return load_font(size)
 # Màu sắc cho các theme
 COLOR_THEMES = [
@@ -240,40 +290,40 @@ def adjust_font_size_by_length(base_size: int, text: str, min_size: int = 30, ma
     new_size = int(base_size * ratio)
     return max(min_size, min(new_size, max_size))
 def suggest_font_by_style(style_value: str) -> str:
-    """Gợi ý font dựa trên phong cách (Vintage, Hiện đại, Châu Âu, ...)"""
+    """Gợi ý font dựa trên phong cách - CHỈ DÙNG FONT HOẠT ĐỘNG"""
     if not style_value or pd.isna(style_value):
-        return "Poppins"
+        return "Allura"
     
     style_lower = style_value.lower().strip()
     
     style_font_map = {
-        "vintage": "Playfair Display",
-        "cổ điển": "Playfair Display",
-        "retro": "Playfair Display",
-        "hiện đại": "Montserrat",
-        "modern": "Montserrat",
-        "contemporary": "Montserrat",
-        "châu âu": "Great Vibes",
-        "european": "Great Vibes",
-        "pháp": "Parisienne",
-        "hàn quốc": "Poppins",
-        "korean": "Poppins",
-        "tây nguyên": "Comfortaa",
-        "mộc mạc": "Lora",
-        "rustic": "Lora",
-        "độc đáo": "Bungee",
-        "unique": "Bungee",
-        "tối giản": "Rubik",
-        "minimalist": "Rubik",
-        "nhật bản": "Chakra Petch",
-        "japanese": "Chakra Petch",
+        # Vintage / Cổ điển
+        "vintage": "Cormorant Garamond", "cổ điển": "Cormorant Garamond", "retro": "Pacifico",
+        # Sang trọng
+        "sang trọng": "Allura", "châu âu": "Allura", "european": "Allura",
+        "pháp": "Allura", "luxury": "Allura",
+        # Hiện đại / Tối giản
+        "hiện đại": "Raleway", "modern": "Raleway",
+        "tối giản": "Raleway", "minimalist": "Raleway",
+        # Trẻ trung / Năng động
+        "dễ thương": "Pacifico", "trẻ trung": "Pacifico", "năng động": "Pacifico",
+        # Chill / Thư giãn
+        "chill": "Allura", "thư giãn": "Allura", "nhẹ nhàng": "Allura",
+        "lãng mạn": "Allura",
+        # Độc đáo
+        "độc đáo": "Baloo 2", "unique": "Baloo 2",
+        # Mộc mạc
+        "mộc mạc": "Cormorant Garamond", "rustic": "Cormorant Garamond",
+        # Hàn Quốc / Nhật Bản
+        "hàn quốc": "Raleway", "korean": "Raleway",
+        "nhật bản": "Raleway", "japanese": "Raleway",
     }
     
     for key, font_name in style_font_map.items():
         if key in style_lower:
             return font_name
     
-    return "Poppins"
+    return "Allura" 
 def download_fallback_font():
     font_path = os.path.join(TEMP_DIR, "NotoSans-Regular.ttf")
     if not os.path.exists(font_path):
@@ -529,7 +579,22 @@ def draw_background_shape(draw, bbox, shape_type, color_theme):
         # Góc dưới phải
         draw.line([(x2-bracket_size, y2), (x2, y2), (x2, y2-bracket_size)], 
                  fill=color_theme["primary"], width=4)
-    
+    elif shape_type == "auto-fit-box":
+        # Shape tự động co giãn theo text - LỰA CHỌN TỐT NHẤT
+        # Vẽ hình chữ nhật bo góc với viền đẹp
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=30, fill=color_theme["bg"])
+        # Thêm viền sáng
+        draw.rounded_rectangle([x1+3, y1+3, x2-3, y2-3], radius=27, 
+                            outline=(255,255,255,80), width=2)
+
+    elif shape_type == "speech-bubble":
+        # Bong bóng thoại - text luôn nằm gọn
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=25, fill=color_theme["bg"])
+        # Thêm đuôi bong bóng
+        tail_x = x1 + 30
+        tail_y = y2
+        points = [(tail_x, tail_y), (tail_x-15, tail_y+20), (tail_x+15, tail_y+20)]
+        draw.polygon(points, fill=color_theme["bg"])
     else:
         # Mặc định là hình chữ nhật bo góc
         draw.rounded_rectangle([x1, y1, x2, y2], radius=20, fill=color_theme["bg"])
@@ -623,7 +688,7 @@ def add_text_with_layout(image_pil, ten, gio, dc, target_size, layout_config, co
         
         pin_size = int(22 * scale_factor / font_scale)
         pin_width = pin_size + 15
-        line_spacing = int(15 * scale_factor)
+        line_spacing = int(25 * scale_factor)
         
         total_height = ten_height + gio_height + (len(dc_lines) * (font_size_info + 8)) + (line_spacing * 3)
         max_width = max(ten_width, gio_width + 30, dc_max_width + pin_width + 10)
@@ -676,35 +741,69 @@ def add_text_with_layout(image_pil, ten, gio, dc, target_size, layout_config, co
             else:
                 y = height - total_height - base_margin
         
-        padding = int(30 * scale_factor)
-        text_bbox = [x - padding, y - padding, x + max_width + padding, y + total_height + padding]
-        draw_background_shape(overlay_draw, text_bbox, shape, color_theme)
+        # ===== TÍNH TOÁN KÍCH THƯỚC SHAPE DỰA TRÊN TEXT =====
+        # Padding xung quanh text (tăng lên để text thoáng hơn)
+        padding_x = int(25 * scale_factor)
+        padding_y = int(18 * scale_factor)
         
+        # Tính chiều rộng tối đa cần cho shape
+        pin_width_for_shape = pin_size + 20 if dc_lines else 0
+        max_text_width = max(ten_width, gio_width, dc_max_width + pin_width_for_shape)
+        
+        # Kích thước shape cuối cùng
+        shape_width = max_text_width + padding_x * 2
+        shape_height = total_height + padding_y * 2
+        
+        # Tọa độ shape (dựa trên vị trí text đã tính)
+        shape_x1 = x - padding_x
+        shape_y1 = y - padding_y
+        shape_x2 = x + shape_width
+        shape_y2 = y + shape_height
+        
+        # Đảm bảo shape không bị tràn ra ngoài ảnh
+        shape_x1 = max(10, shape_x1)
+        shape_y1 = max(10, shape_y1)
+        shape_x2 = min(width - 10, shape_x2)
+        shape_y2 = min(height - 10, shape_y2)
+        
+        # Vẽ shape với kích thước đã tính toán chính xác
+        draw_background_shape(overlay_draw, [shape_x1, shape_y1, shape_x2, shape_y2], shape, color_theme)
+        
+        # Merge overlay với ảnh gốc
         img = Image.alpha_composite(img, overlay)
         draw = ImageDraw.Draw(img)
         
+        # Màu sắc text
         text_color = "#FFFFFF" if color_theme["text_light"] else "#000000"
         hour_color = "#FFD700" if color_theme["text_light"] else "#FF8C00"
         secondary_text_color = "#E0E0E0" if color_theme["text_light"] else "#333333"
         outline_color = (0, 0, 0) if color_theme["text_light"] else (255, 255, 255)
         
-        current_y = y + 15
-        
+               # Tính lại vị trí text bên trong shape (căn trái hoặc căn giữa)
         if position in ["bottom-center", "top-center-edge"]:
-            text_x = x + (max_width - ten_width) // 2
+            text_x = shape_x1 + (shape_width - ten_width) // 2
         elif position in ["left-center", "right-center"]:
-            text_x = x + 20
+            text_x = shape_x1 + padding_x
         else:
-            text_x = x + 20
+            text_x = shape_x1 + padding_x
         
+        current_y = shape_y1 + padding_y
+        
+        # === 1. VẼ TÊN QUÁN ===
         for offset_x, offset_y in [(-2,-2), (-2,2), (2,-2), (2,2)]:
             draw.text((text_x + offset_x, current_y + offset_y), ten_text, fill=outline_color, font=font_ten)
         draw.text((text_x, current_y), ten_text, fill=text_color, font=font_ten)
-        current_y += ten_height + line_spacing
         
+        # CẬP NHẬT current_y: cộng chiều cao tên + khoảng cách line_spacing
+        current_y += ten_height + line_spacing   # <--- QUAN TRỌNG: phải có line_spacing
+        
+        # === 2. VẼ GIỜ MỞ CỬA ===
         draw.text((text_x, current_y), gio_text, fill=hour_color, font=font_info)
-        current_y += gio_height + line_spacing
         
+        # CẬP NHẬT current_y: cộng chiều cao giờ + khoảng cách
+        current_y += gio_height + line_spacing   # <--- THÊM DÒNG NÀY
+        
+        # === 3. VẼ ĐỊA CHỈ (có icon pin) ===
         for i, line in enumerate(dc_lines):
             if i == 0:
                 pin_x = text_x + 7
@@ -742,7 +841,7 @@ def add_text_with_layout(image_pil, ten, gio, dc, target_size, layout_config, co
         draw = ImageDraw.Draw(img)
         draw.text((50, 50), f"Lỗi: {str(e)[:100]}", fill="red")
         return img
-
+    
 def draw_text_with_spacing(draw, position, text, font, fill, spacing=0):
     """Vẽ text với khoảng cách giữa các chữ - GIÃN CÁCH ĐỀU"""
     x, y = position
@@ -814,10 +913,9 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
         secondary_rgb = hex_to_rgb(cover_colors["secondary"])
 
         # ===== TITLE =====
-        # Xử lý theo font_style
         if font_style == "Viết hoa chữ cái đầu":
             title_text = "Khám Phá Đà Lạt"
-        else:  # "Bình thường" hoặc "In hoa toàn bộ" đều dùng in hoa
+        else:
             title_text = "KHÁM PHÁ ĐÀ LẠT"
         
         title_bbox = draw.textbbox((0, 0), title_text, font=font_title)
@@ -827,7 +925,6 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
         title_x = (target_size[0] - title_w) // 2
         title_y = int(target_size[1] * 0.07)
 
-        # Khung title
         draw.rounded_rectangle(
             [title_x - 50, title_y - 40, title_x + title_w + 50, title_y + title_h + 40],
             radius=35,
@@ -836,18 +933,15 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
             width=3
         )
         
-        # Hiệu ứng glow
         for offset in range(3, 0, -1):
             draw.text((title_x, title_y - offset), title_text, fill=(*primary_rgb, 100), font=font_title)
         
         draw.text((title_x, title_y), title_text, fill=primary_rgb, font=font_title)
 
-        # ===== CÂU MÔ TẢ PHỤ (thay đổi theo từng bộ) =====
-             # ===== CÂU MÔ TẢ PHỤ (thay đổi theo từng bộ) =====
+        # ===== CÂU MÔ TẢ PHỤ =====
         if cover_description is None:
             cover_description = "Những quán cafe nhất định phải đi khi đến Đà Lạt"
         
-        # Xuống dòng nếu câu quá dài
         max_subtitle_width = target_size[0] * 0.7
         subtitle_lines = []
         current_line = ""
@@ -866,19 +960,15 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
         if current_line:
             subtitle_lines.append(current_line)
         
-        # Vẽ câu mô tả
         subtitle_y = title_y + title_h + 100
-        line_spacing = 45  # Khoảng cách giữa các dòng
+        line_spacing = 45
         
         for idx, line in enumerate(subtitle_lines):
             line_bbox = draw.textbbox((0, 0), line, font=font_subtitle)
             line_w = line_bbox[2] - line_bbox[0]
             line_x = (target_size[0] - line_w) // 2
-            
-            # Tính vị trí y dựa trên số thứ tự dòng
             current_y = subtitle_y + idx * (font_subtitle.size + line_spacing)
             
-            # Background mờ cho subtitle
             draw.rounded_rectangle(
                 [line_x - 20, current_y - 8, line_x + line_w + 20, current_y + font_subtitle.size + 8],
                 radius=15,
@@ -886,15 +976,13 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
             )
             draw.text((line_x, current_y), line, fill=secondary_rgb, font=font_subtitle)
         
-        # Cập nhật subtitle_y cho phần tiếp theo (vị trí sau khi vẽ xong tất cả dòng)
         if subtitle_lines:
-            # Lấy vị trí cuối cùng của dòng cuối + padding
             last_line_y = subtitle_y + (len(subtitle_lines) - 1) * (font_subtitle.size + line_spacing)
             final_subtitle_y = last_line_y + font_subtitle.size + 30
         else:
             final_subtitle_y = subtitle_y + font_subtitle.size + 30
 
-        # ===== TÍNH TOÁN KÍCH THƯỚC THỰC TẾ CỦA TỪNG ITEM =====
+        # ===== TÍNH TOÁN KÍCH THƯỚC =====
         max_actual_height = 0
         for i in range(min(len(quan_list), 8)):
             name_text = quan_list[i].upper()
@@ -914,9 +1002,17 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
         max_items = min(max_items, len(quan_list), 8)
         
         circle_r = 32
-        padding_x = 35
-
-        # Tìm chiều rộng lớn nhất của tên quán
+        
+        # ===== KHAI BÁO HẰNG SỐ =====
+             # ===== KHAI BÁO HẰNG SỐ =====
+        SPACING_VALUE = 9
+        FIXED_PADDING_X = 55
+        FIXED_PADDING_Y = 42
+        
+        # CHIỀU CAO CỐ ĐỊNH CHO TẤT CẢ SHAPE
+        FIXED_SHAPE_HEIGHT = 65  # Điều chỉnh giá trị này theo ý muốn
+        
+        # Tìm chiều rộng lớn nhất
         max_name_width = 0
         for i in range(max_items):
             name_text = quan_list[i].upper()
@@ -924,9 +1020,11 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
                 name_text = name_text[:27] + "..."
             name_bbox = draw.textbbox((0, 0), name_text, font=font_body)
             name_w = name_bbox[2] - name_bbox[0]
-            max_name_width = max(max_name_width, name_w)
+            total_spacing = SPACING_VALUE * (len(name_text) - 1)
+            name_w_with_spacing = name_w + total_spacing
+            max_name_width = max(max_name_width, name_w_with_spacing)
 
-        total_item_width = (circle_r * 2) + 25 + (max_name_width + padding_x * 2)
+        total_item_width = (circle_r * 2) + 25 + (max_name_width + FIXED_PADDING_X * 2)
         center_start_x = (target_size[0] - total_item_width) // 2
 
         # Vẽ từng item
@@ -962,20 +1060,31 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
             number_y = circle_y - th // 2
             draw.text((number_x, number_y), number_text, fill=(255, 255, 255), font=font_number)
 
-            # Tên quán
+            # ===== TÊN QUÁN - SHAPE CÓ CHIỀU CAO CỐ ĐỊNH =====
             name_text = quan_list[i].upper()
             if len(name_text) > 30:
                 name_text = name_text[:27] + "..."
-            name_bbox = draw.textbbox((0, 0), name_text, font=font_body)
-            name_w = name_bbox[2] - name_bbox[0]
-            name_h = name_bbox[3] - name_bbox[1]
-
-            name_bg_w = name_w + padding_x * 2
-            name_bg_h = name_h + padding_y * 2
+            
+            # Đo kích thước text
+            temp_bbox = draw.textbbox((0, 0), name_text, font=font_body)
+            name_w = temp_bbox[2] - temp_bbox[0]
+            name_h = temp_bbox[3] - temp_bbox[1]
+            
+            # Tính spacing
+            total_spacing_width = SPACING_VALUE * (len(name_text) - 1)
+            name_w_with_spacing = name_w + total_spacing_width
+            
+            # CHIỀU RỘNG: phụ thuộc vào text (để vừa chữ)
+            name_bg_w = name_w_with_spacing + FIXED_PADDING_X * 2
+            
+            # CHIỀU CAO: CỐ ĐỊNH cho tất cả shape
+            name_bg_h = FIXED_SHAPE_HEIGHT
+            
+            # Vị trí shape
             name_bg_x = circle_x + circle_r + 25
             name_bg_y = y_pos + (actual_item_height - name_bg_h) // 2
 
-            # Khung nền cho tên quán
+            # Vẽ shape
             draw.rounded_rectangle(
                 [name_bg_x, name_bg_y, name_bg_x + name_bg_w, name_bg_y + name_bg_h],
                 radius=28,
@@ -983,16 +1092,19 @@ def create_cover_image(background_img, quan_list, descriptions, target_size, col
                 outline=(primary_rgb[0], primary_rgb[1], primary_rgb[2], 150),
                 width=2
             )
+            
             # Thanh highlight bên trái
             draw.rounded_rectangle(
                 [name_bg_x, name_bg_y + 10, name_bg_x + 5, name_bg_y + name_bg_h - 10],
                 radius=3,
                 fill=primary_rgb
             )
-            # Vẽ text
-            text_x = name_bg_x + padding_x + 12
-            text_y = name_bg_y + padding_y
-            draw_text_with_spacing(draw, (text_x, text_y), name_text, font_body, (255, 255, 255), spacing=7)
+            
+            # Vẽ text - CĂN GIỮA THEO CHIỀU DỌC TRONG SHAPE CỐ ĐỊNH
+            text_x = name_bg_x + FIXED_PADDING_X
+            text_y = name_bg_y + (name_bg_h - name_h) // 2
+            
+            draw_text_with_spacing(draw, (text_x, text_y), name_text, font_body, (255, 255, 255), spacing=SPACING_VALUE)
 
         # ===== FOOTER =====
         footer_text = "Riviu • Khám phá Đà Lạt cùng chúng tôi"
@@ -1462,20 +1574,13 @@ with st.sidebar:
         fixed_position = st.selectbox("Vị trí text", TEXT_POSITIONS)
         fixed_shape = st.selectbox("Hình dạng nền", BACKGROUND_SHAPES)
         fixed_theme = st.selectbox("Theme màu", [t["name"] for t in COLOR_THEMES])
-        st.markdown("---")
+    st.markdown("---")
     st.markdown("### ✨ Cấu hình Font chữ")
     
-    # Danh sách font
-    font_categories = {
-        "Serif (Sang trọng)": ["Playfair Display", "Cormorant Garamond", "Libre Baskerville", "DM Serif Display", "Prata", "Lora"],
-        "Sans-serif (Hiện đại)": ["Be Vietnam Pro", "Montserrat", "Poppins", "Raleway", "Rubik", "Lexend", "Barlow Condensed", "Oswald"],
-        "Script (Viết tay)": ["Great Vibes", "Allura", "Satisfy", "Parisienne", "Sacramento"],
-        "Stylized (Độc lạ)": ["Bungee", "Fredoka", "Baloo 2", "Comfortaa", "Chakra Petch"],
-    }
-    all_fonts = []
-    for fonts in font_categories.values():
-        all_fonts.extend(fonts)
+    # Lấy danh sách tất cả font
+    all_fonts = get_all_fonts_list()
     
+    # Chọn font đơn lẻ
     default_font_index = 0
     if st.session_state.suggested_font and st.session_state.suggested_font in all_fonts:
         default_font_index = all_fonts.index(st.session_state.suggested_font)
@@ -1484,17 +1589,9 @@ with st.sidebar:
     font_style = st.radio("Phong cách chữ:", ["Bình thường", "In hoa toàn bộ", "Viết hoa chữ cái đầu"], index=0)
     random_font_per_set = st.checkbox("🎲 Random font mỗi bộ", value=False, help="Mỗi bộ sẽ dùng 1 font ngẫu nhiên khác nhau")
     
-    # Preview font
-    st.markdown("**🔤 Mẫu chữ:**")
-    preview_text = "Riviu Đà Lạt 123"
-    st.markdown(f"""
-    <div style="font-family: '{selected_font}', sans-serif; font-size: 24px; padding: 10px; border: 1px solid #ddd; border-radius: 10px; background-color: #f0f2f6; margin-bottom: 10px;">
-        {preview_text}
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Gợi ý font dựa trên phong cách (nếu có Excel và cột Phong_cach)
-    if 'df' in locals() and df is not None and style_col:
+   # Gợi ý font dựa trên phong cách (nếu có Excel và cột Phong_cach)
+try:
+    if df is not None and style_col:
         styles = df[style_col].dropna().unique()
         if len(styles) > 0:
             most_common_style = df[style_col].mode()[0] if not df[style_col].mode().empty else styles[0]
@@ -1504,6 +1601,8 @@ with st.sidebar:
                 if st.button(f"✨ Dùng font {suggested}"):
                     st.session_state.suggested_font = suggested
                     st.rerun()
+except NameError:
+    pass
     st.markdown("---")
     st.markdown("### ℹ️ Hướng dẫn")
     st.markdown("""
@@ -1674,7 +1773,7 @@ if st.button("🚀 XUẤT NỘI DUNG HÀNG LOẠT", type="primary", use_containe
             elif layout_mode == "Random mỗi bộ (đồng bộ màu)":
                 set_color_theme = random.choice(COLOR_THEMES)
                 set_layout = {
-                    "position": random.choice(TEXT_POSITIONS),
+                    "position": random.choice([p for p in TEXT_POSITIONS if p not in ["top-right", "right-center"]]),
                     "shape": random.choice(BACKGROUND_SHAPES)
                 }
                 use_consistent_layout = True  # Dùng chung layout cho cả bộ
@@ -1693,6 +1792,7 @@ if st.button("🚀 XUẤT NỘI DUNG HÀNG LOẠT", type="primary", use_containe
             set_descriptions = []
                # Chọn font cho bộ này
             if random_font_per_set:
+                all_fonts = get_all_fonts_list()
                 current_font = random.choice(all_fonts)
             else:
                 current_font = selected_font
